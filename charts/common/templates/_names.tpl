@@ -31,6 +31,17 @@ If release name contains chart name it will be used as a full name.
 {{- end }}
 
 {{/*
+Create a default app name by providing content that should be used to produce the final value.
+
+Usage:
+{{ include "common.names.managedname" (dict "content" .Values.content "context" $) }}
+*/}}
+{{- define "common.names.managedname" -}}
+{{- default .context.Chart.Name (default .content.name .content.nameOverride) | trunc 63 | trimSuffix "-" }}
+{{- end -}}
+
+
+{{/*
 Create a default fully qualified app name by providing content that should be used to produce the final value.
 
 Usage:
@@ -42,9 +53,17 @@ Usage:
 {{- else -}}
 {{- $name := default .context.Chart.Name .content.nameOverride -}}
 {{- if contains $name .context.Release.Name -}}
+{{- if .content.name -}}
 {{- printf "%s-%s" .context.Release.Name .content.name | trunc 63 | trimSuffix "-" -}}
 {{- else -}}
+{{- printf "%s" .context.Release.Name | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+{{- else -}}
+{{- if .content.name -}}
 {{- printf "%s-%s-%s" .context.Release.Name $name .content.name | trunc 63 | trimSuffix "-" -}}
+{{- else -}}
+{{- printf "%s-%s" .context.Release.Name $name | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
 {{- end -}}
 {{- end -}}
 {{- end -}}
@@ -57,6 +76,16 @@ Usage:
 */}}
 {{- define "common.names.fullnameSuffix" -}}
 {{- (printf "%s-%s" (include "common.names.fullname" .context) .suffix) | trunc 63 | trimSuffix "-" -}}
+{{- end }}
+
+{{/*
+Append a provided suffix to a managed fully qualified app name.
+
+Usage:
+{{ include "common.names.managedfullnameSuffix" (dict "content" "content-value" "suffix" "suffix-value "context" $) }}
+*/}}
+{{- define "common.names.managedfullnameSuffix" -}}
+{{- (printf "%s-%s" (include "common.names.managedfullname" (dict "context" .context "content" .content)) .suffix) | trunc 63 | trimSuffix "-" -}}
 {{- end }}
 
 {{/*
@@ -84,12 +113,12 @@ Create the name of the service account to use
 Usage:
 
 To specify a value other than using the fullname, a dict of values must be provided
-{{ include "common.names.serviceAccountName" (dict "serviceAccount" .Values.serviceAccount "context" $) }}
+{{ include "common.names.serviceAccountName" (dict "content" .Values "context" $) }}
 */}}
 {{- define "common.names.serviceAccountName" -}}
-{{- if .serviceAccount }}
-{{- if .serviceAccount.create }}
-{{- default (include "common.names.fullname" (default $ .context)) .serviceAccount.name }}
+{{- if .content.serviceAccount }}
+{{- if .content.serviceAccount.create }}
+{{- default (include "common.names.managedfullname" (dict "content" .content "context" .context)) }}
 {{- else }}
 {{- default "default" .serviceAccount.name }}
 {{- end }}

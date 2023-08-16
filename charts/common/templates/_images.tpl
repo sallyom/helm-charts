@@ -8,3 +8,4 @@ Create the image path for the passed in image field
 {{- printf "%s/%s:%s" .registry .repository .version -}}
 {{- end -}}
 {{- end -}}
+

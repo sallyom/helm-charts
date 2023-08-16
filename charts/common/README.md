@@ -1,6 +1,6 @@
 # common
 
-![Version: 0.1.0](https://img.shields.io/badge/Version-0.1.0-informational?style=flat-square) ![Type: library](https://img.shields.io/badge/Type-library-informational?style=flat-square)
+![Version: 0.1.2](https://img.shields.io/badge/Version-0.1.2-informational?style=flat-square) ![Type: library](https://img.shields.io/badge/Type-library-informational?style=flat-square)
 
 A Library Helm Chart containing common logic for use by Sigstore charts
 
@@ -38,8 +38,10 @@ A Library Helm Chart containing common logic for use by Sigstore charts
 | `common.names.name`               | Returns the name of the chart                                                                     | `.` Chart context                                    |
 | `common.names.chart`              | Returns the name of the chart used by the chart label                                             | `.` Chart context                                    |
 | `common.names.fullname`           | Returns the fully qualified application name                                                      | `.` Chart context                                    |
-| `common.names.managedfullname`    | Returns the fully qualified application name by providing a context to use                        | `dict "content" .Values.content "context" $`         |
+| `common.names.managedfullname`    | Returns the fully qualified managed application name by providing a context to use                        | `dict "content" .Values.content "context" $`         |
 | `common.names.fullnameSuffix`     | Returns the fully qualified application name appended by a provided suffix                        | `dict "suffix" "suffix-value "context" $`            |
+| `common.names.managedfullnameSuffix`     | Returns the fully qualified managed application name appended by a provided suffix suffix                        | `dict "suffix" "suffix-value "context" $ "content" "content-value `             |
+
 | `common.names.rawnamespace`       | Returns the raw namespace if set with forceNamespace or .Release.Namespace is set                 | `.` Chart context                                    |
 | `common.names.serviceAccountName` | Returns the name of the Service account. See [ServiceAccount](#serviceaccount) for the structure. | `.Values.serviceAccount` Reference to ServiceAccount |
 
@@ -48,6 +50,7 @@ A Library Helm Chart containing common logic for use by Sigstore charts
 | Name                           | Description                                 | Expected Input        |
 |--------------------------------|---------------------------------------------|-----------------------|
 | `common.network.containerPorts`         | Returns the `containerPorts` property of a PodSpec         | `dict` containing `port`, `targetPort` and optional `protocol`     |
+| `common.network.ingress.backend`         | Returns the backend of an `Ingress`         | `list` containing root context, local context and optional service port    |
 
 
 ## Input Schemas 
