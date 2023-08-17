@@ -4,7 +4,7 @@ entries:
   - annotations:
       artifacthub.io/license: Apache-2.0
     apiVersion: v2
-    created: "2023-08-16T22:56:05.257603248-04:00"
+    created: "2023-08-17T13:47:34.368032771-04:00"
     dependencies:
     - condition: fulcio.enabled
       name: fulcio
@@ -43,4 +43,4 @@ entries:
     urls:
     - https://commandtheline.com/helm-charts/scaffold-0.6.22.tgz
     version: 0.6.22
-generated: "2023-08-16T22:56:05.247181455-04:00"
+generated: "2023-08-17T13:47:34.357832608-04:00"
