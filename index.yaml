@@ -1,8 +1,40 @@
 apiVersion: v1
 entries:
+  ctlog:
+  - annotations:
+      artifacthub.io/images: |
+        - name: ct_server
+          image: ghcr.io/sigstore/scaffolding/ct_server@sha256:2ea576af6b64e154b718b058cd03b74fac8399affcf93c4251ab2234704ca432
+        - name: createctconfig
+          image: ghcr.io/sigstore/scaffolding/createctconfig@sha256:b3dae896ddb7b01b3257c668bc1e87f15aafe97f30a767f99426f557fa33e44c
+        - name: createtree
+          image: ghcr.io/sigstore/scaffolding/createtree@sha256:2da5284bb29e18d125e4565d47256d0ded82c3a7001b44a4d152e2475ca1166c
+        - name: curlimages/curl
+          image: docker.io/curlimages/curl@sha256:48318407b8d98e8c7d5bd4741c88e8e1a5442de660b47f63ba656e5c910bc3da
+      artifacthub.io/license: Apache-2.0
+    apiVersion: v2
+    appVersion: 0.3.0
+    created: "2023-08-21T22:00:43.22540312-04:00"
+    dependencies:
+    - name: common
+      repository: https://sigstore.github.io/helm-charts
+      version: 0.1.0
+    description: Certificate Log
+    digest: 7b980d0121c6466b9a62acf90a7fb2dfe638edafcf076435f9d8313358641722
+    home: https://sigstore.dev/
+    keywords:
+    - security
+    - pki
+    maintainers:
+    - name: The Sigstore Authors
+    name: ctlog
+    type: application
+    urls:
+    - https://commandtheline.com/helm-charts/ctlog-0.3.0.tgz
+    version: 0.3.0
   scaffolding:
   - apiVersion: v2
-    created: "2023-08-17T15:02:14.923757484-04:00"
+    created: "2023-08-21T22:00:43.236114603-04:00"
     dependencies:
     - name: scaffold
       repository: https://sigstore.github.io/helm-charts
@@ -14,4 +46,4 @@ entries:
     urls:
     - https://commandtheline.com/helm-charts/scaffolding-0.1.0.tgz
     version: 0.1.0
-generated: "2023-08-17T15:02:14.913019225-04:00"
+generated: "2023-08-21T22:00:43.223573813-04:00"
