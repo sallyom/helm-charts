@@ -14,7 +14,7 @@ entries:
       artifacthub.io/license: Apache-2.0
     apiVersion: v2
     appVersion: 0.3.0
-    created: "2023-08-23T10:46:46.131096778-04:00"
+    created: "2023-08-23T12:11:19.965756741-04:00"
     dependencies:
     - name: common
       repository: https://sigstore.github.io/helm-charts
@@ -36,7 +36,7 @@ entries:
   - annotations:
       artifacthub.io/license: Apache-2.0
     apiVersion: v2
-    created: "2023-08-23T10:46:46.141457033-04:00"
+    created: "2023-08-23T12:11:19.977162567-04:00"
     dependencies:
     - condition: fulcio.enabled
       name: fulcio
@@ -52,8 +52,8 @@ entries:
       version: 0.2.8
     - condition: ctlog.enabled
       name: ctlog
-      repository: https://commandtheline.com/helm-charts
-      version: 0.3.0
+      repository: https://sigstore.github.io/helm-charts
+      version: 0.2.44
     - condition: tuf.enabled
       name: tuf
       repository: https://sigstore.github.io/helm-charts
@@ -63,7 +63,7 @@ entries:
       repository: https://sigstore.github.io/helm-charts
       version: 0.1.0
     description: Scaffolding the components of the sigstore architecture
-    digest: 5490b726a9c37b7f282f14133de38d423f6da71396de69a8b4db2fee7e76e84f
+    digest: 87552a641d9661cdbe879f37ef32da51c8515ade62cc5f7f6257017fc2c4b031
     home: https://sigstore.dev/
     keywords:
     - security
@@ -75,4 +75,4 @@ entries:
     urls:
     - https://commandtheline.com/helm-charts/scaffold-0.6.22.tgz
     version: 0.6.22
-generated: "2023-08-23T10:46:46.128362071-04:00"
+generated: "2023-08-23T12:11:19.964051743-04:00"
