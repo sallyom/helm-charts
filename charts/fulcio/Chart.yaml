@@ -19,8 +19,8 @@ maintainers:
 
 dependencies:
   - name: ctlog
-    version: 0.2.43
-    repository: https://sigstore.github.io/helm-charts
+    version: 0.3.0
+    repository: https://commandtheline/helm-charts
     condition: ctlog.enabled
 
 annotations:
