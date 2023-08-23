@@ -14,13 +14,13 @@ entries:
       artifacthub.io/license: Apache-2.0
     apiVersion: v2
     appVersion: 0.3.0
-    created: "2023-08-21T22:08:27.586405104-04:00"
+    created: "2023-08-23T10:46:46.131096778-04:00"
     dependencies:
     - name: common
       repository: https://sigstore.github.io/helm-charts
-      version: 0.1.0
+      version: 0.1.2
     description: Certificate Log
-    digest: 7b980d0121c6466b9a62acf90a7fb2dfe638edafcf076435f9d8313358641722
+    digest: 142cb777da3616d65530e77ef5c0d4db522297ed1601e0a83299e4a3bf2d554a
     home: https://sigstore.dev/
     keywords:
     - security
@@ -36,7 +36,7 @@ entries:
   - annotations:
       artifacthub.io/license: Apache-2.0
     apiVersion: v2
-    created: "2023-08-21T22:08:27.596998545-04:00"
+    created: "2023-08-23T10:46:46.141457033-04:00"
     dependencies:
     - condition: fulcio.enabled
       name: fulcio
@@ -75,4 +75,4 @@ entries:
     urls:
     - https://commandtheline.com/helm-charts/scaffold-0.6.22.tgz
     version: 0.6.22
-generated: "2023-08-21T22:08:27.58465313-04:00"
+generated: "2023-08-23T10:46:46.128362071-04:00"
