@@ -4,7 +4,7 @@ description: Certificate Log
 
 type: application
 
-version: 0.3.0
+version: 0.3.0 # bumped for ctlog-v2
 appVersion: 0.3.0
 
 keywords:
@@ -18,8 +18,8 @@ maintainers:
 
 dependencies:
   - name: common
-    version: 0.1.2
-    repository: https://sigstore.github.io/helm-charts
+    version: 0.2.0 # bumped for common-v2, ctlog-v2
+    repository: https://repo-securesign-helm.apps.open-svc-sts.k1wl.p1.openshiftapps.com/helm-charts
 
 annotations:
   artifacthub.io/license: Apache-2.0
