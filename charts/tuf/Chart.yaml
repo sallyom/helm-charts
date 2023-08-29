@@ -2,8 +2,9 @@ apiVersion: v2
 name: tuf
 description: A framework for securing software update systems - the scaffolding implementation
 type: application
-version: 0.1.6
-appVersion: "0.6.7"
+# TODO: versioning for v2 charts
+version: 0.2.0
+appVersion: "0.7.0"
 
 home: https://sigstore.dev/
 sources:
@@ -12,6 +13,16 @@ sources:
 maintainers:
 - name: The Sigstore Authors
   url: https://sigstore.dev/
+
+# temporary location for common-v2
+dependencies:
+  - name: common
+    version: 0.1.2
+    repository: https://repo-securesign-helm-v2.apps.open-svc-sts.k1wl.p1.openshiftapps.com/helm-charts
+  #- name: common
+  #  version: 0.1.1
+  #  repository: https://sigstore.github.io/helm-charts
+
 
 annotations:
   artifacthub.io/license: Apache-2.0

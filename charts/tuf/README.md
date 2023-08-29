@@ -29,7 +29,6 @@ A framework for securing software update systems - the scaffolding implementatio
 | deployment.version | string | `"sha256:c77d098e0e62f791cc87b63ae43a5fea505225e0ec38686c4a392c0cad7238bf"` |  |
 | enabled | bool | `true` |  |
 | forceNamespace | string | `""` |  |
-| fullnameOverride | string | `"tuf"` |  |
 | imagePullSecrets | list | `[]` |  |
 | ingress.annotations | object | `{}` |  |
 | ingress.className | string | `"nginx"` |  |

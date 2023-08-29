@@ -1,69 +1,108 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ template "tuf.deployment.fullname" . }}
-{{ include "tuf.namespace" . | indent 2 }}
-{{- if .Values.deployment.annotations }}
+  name: {{ tpl (include "common.names.fullname" $) $ }}
+{{ tpl (include "common.names.namespace" $) $ | indent 2 }}
+{{- if .Values.server.annotations }}
   annotations:
-    {{- toYaml .Values.deployment.annotations | nindent 4 }}
+    {{- tpl (toYaml .Values.server.annotations) $ | nindent 8 }}
 {{- end }}
   labels:
-    {{- include "tuf.metaLabels" . | nindent 4 }}
-    {{- include "tuf.matchLabels" . | nindent 4 }}
-
+    {{- tpl (include "common.labels.labels" $) $ | nindent 4 }}
 spec:
-  replicas: {{ .Values.deployment.replicas }}
+  replicas: {{ tpl (.Values.server.replicaCount | toString) $ }}
   selector:
     matchLabels:
-      {{- include "tuf.matchLabels" . | nindent 6 }}
-
-{{- if .Values.deployment.strategy }}
-  strategy:
-{{ toYaml .Values.deployment.strategy | trim | indent 4 }}
-    {{ if eq .Values.deployment.strategy.type "Recreate" }}rollingUpdate: null{{ end }}
-{{- end }}
+      {{- tpl (include "common.labels.selectorLabels" $) $ | nindent 6 }}
   template:
     metadata:
       labels:
-        {{- include "tuf.metaLabels" . | nindent 8 }}
-        {{- include "tuf.matchLabels" . | nindent 8 }}
+        {{- tpl (include "common.labels.selectorLabels" $) $ | nindent 8 }}
     spec:
-      serviceAccountName: {{ .Values.serviceAccountName }}
+      serviceAccountName: {{ tpl (include  "tuf.serviceAccountName" $) $ }}
       containers:
-      - image: {{ template "tuf.image" .Values.deployment }}
-        name: {{ .Values.deployment.name }}
-        ports:
-          - containerPort: {{ .Values.deployment.port }}
-        env:
-        - name: NAMESPACE
-          valueFrom:
-            fieldRef:
-              fieldPath: metadata.namespace
-
-        volumeMounts:
-          - name: tuf-secrets
-            mountPath: "/var/run/tuf-secrets"
-            readOnly: true
-      volumes:
-      - name: tuf-secrets
-        projected:
-          sources: 
-          - secret:
-              name: {{ .Values.secrets.ctlog.name }}
-              items:
-              - key: {{ .Values.secrets.ctlog.key }}
-                path: {{ .Values.secrets.ctlog.path }}
-          - secret:
-              name: {{ .Values.secrets.fulcio.name }}
-              items:
-              - key: {{ .Values.secrets.fulcio.key }}
-                path: {{ .Values.secrets.fulcio.path }}
-          - secret:
-              name: {{ .Values.secrets.rekor.name }}
-              items:
-              - key: {{ .Values.secrets.rekor.key }}
-                path: {{ .Values.secrets.rekor.path }}
-    {{- if .Values.imagePullSecrets }}
-      imagePullSecrets:
-{{ toYaml .Values.imagePullSecrets | indent 8 }}
+        - name: {{ tpl (include "common.names.fullname" $) $ }}
+          image: "{{ tpl (include "common.images.image" .Values.server.image) $ }}"
+          imagePullPolicy: "{{ tpl (.Values.server.image.imagePullPolicy) $ }}"
+{{- tpl (include "common.images.imagePullSecrets" (dict "pullSecrets" (list .Values.server.image.imagePullSecrets) "context" $)) $ | indent 10 }}
+          args:
+{{ tpl (toYaml .Values.server.extraArgs) $ | indent 12 }}
+          env:
+            - name: NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+        {{- if .Values.server.extraEnvVars }}
+{{ tpl (toYaml .Values.server.extraEnvVars) $ | indent 12 }}
+        {{- end }}
+        {{- if or .Values.server.extraEnvVarsCM .Values.server.extraEnvVarsSecret }}
+          envFrom:
+        {{- if .Values.server.extraEnvVarsCM }}
+            - configMapRef:
+              name: {{ tpl (.Values.server.extraEnvVarsCM) $ }}
+        {{- end }}
+        {{- if .Values.server.extraEnvVarsSecret }}
+            - secretRef:
+              name: {{ tpl (.Values.server.extraEnvVarsSecret) $ }}
+        {{- end }}
+        {{- end }}
+        {{- if .Values.server.livenessProbe }}
+          livenessProbe:
+{{ tpl (toYaml .Values.server.livenessProbe) $ | indent 12 }}
+        {{- end }}
+        {{- if .Values.server.readinessProbe }}
+          readinessProbe:
+{{ tpl (toYaml .Values.server.readinessProbe) $ | indent 12 }}
+        {{- end }}
+          ports:
+{{- include "common.network.containerPorts" .Values.server.service.ports | indent 12 }}
+        {{- if .Values.server.resources }}
+          resources:
+{{ tpl (toYaml .Values.server.resources $) | indent 12 }}
+        {{- end }}
+          volumeMounts:
+            - name: tuf-secrets
+              mountPath: "/var/run/tuf-secrets"
+              readOnly: true
+        {{- if .Values.server.extraVolumeMounts }}
+{{ tpl (toYaml .Values.server.extraVolumeMounts) $ | indent 12 }}
+        {{- end }}
+        {{- if .Values.server.containerSecurityContext }}
+          securityContext:
+{{ tpl (omit .Values.server.containerSecurityContext "enabled" | toYaml) $ | indent 12 }}
+        {{- end }}
+    {{- if .Values.server.podSecurityContext.enabled }}
+      securityContext:
+{{ tpl (omit .Values.server.podSecurityContext "enabled" | toYaml) $ | indent 10 }}
     {{- end }}
+    {{- if .Values.server.tolerations }}
+      tolerations:
+{{ tpl (toYaml .Values.server.tolerations) $ | indent 10 }}
+    {{- end }}
+    {{- if .Values.server.nodeSelector }}
+      nodeSelector:
+{{ tpl (toYaml .Values.server.nodeSelector) $ | indent 10 }}
+    {{- end }}
+      volumes:
+    {{- if .Values.server.extraVolumes }}
+{{ tpl (toYaml .Values.server.extraVolumes) $ | indent 10 }}
+    {{- end }}
+        - name: tuf-secrets
+          projected:
+            sources: 
+            - secret:
+                name: {{ .Values.secrets.ctlog.name }}
+                items:
+                - key: {{ .Values.secrets.ctlog.key }}
+                  path: {{ .Values.secrets.ctlog.path }}
+            - secret:
+                name: {{ .Values.secrets.fulcio.name }}
+                items:
+                - key: {{ .Values.secrets.fulcio.key }}
+                  path: {{ .Values.secrets.fulcio.path }}
+            - secret:
+                name: {{ .Values.secrets.rekor.name }}
+                items:
+                - key: {{ .Values.secrets.rekor.key }}
+                  path: {{ .Values.secrets.rekor.path }}
+

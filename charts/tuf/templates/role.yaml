@@ -1,9 +1,12 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-  name: {{ .Values.roleName }}
-{{ include "tuf.namespace" . | indent 2 }}
+  name: {{ tpl (.Values.roleName) $ }}
+{{ tpl (include "common.names.namespace" $) $ | indent 2 }}
+  labels:
+    app.kubernetes.io/component: {{ tpl (include "common.names.name" $) $ }}
+    {{- tpl (include "common.labels.labels" $) $ | nindent 4 }}
 rules:
-  - apiGroups: [""]
+  - apiGroups: [""] # "" indicates the core API group
     resources: ["secrets"]
     verbs: ["create", "get", "update"]

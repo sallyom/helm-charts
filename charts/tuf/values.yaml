@@ -1,19 +1,64 @@
-forceNamespace: ""
-imagePullSecrets: []
+global:
+  imagePullSecrets: []
+
 serviceAccountName: tuf
+forceNamespace: ""
 roleName: tuf
 roleBindingName: tuf
-fullnameOverride: tuf
 enabled: true
 
-deployment:
-  name: tuf
-  replicas: 1
-  registry: ghcr.io
-  repository: sigstore/scaffolding/server
-  version: sha256:c77d098e0e62f791cc87b63ae43a5fea505225e0ec38686c4a392c0cad7238bf
-  imagePullPolicy: IfNotPresent
-  port: 8080
+namespace:
+  create: false
+  name: tuf-system
+
+server:
+  replicaCount: 1
+  image:
+    registry: ghcr.io
+    repository: sigstore/scaffolding/server
+    version: sha256:c77d098e0e62f791cc87b63ae43a5fea505225e0ec38686c4a392c0cad7238bf
+    imagePullPolicy: IfNotPresent
+
+  serviceAccount:
+    create: true
+    name: ""
+    annotations: {}
+    mountToken: false
+
+  annotations: {}
+  nodeSelector: {}
+  tolerations: []
+  extraEnvVars: []
+  extraEnvVarsCM: ""
+  extraEnvVarsSecret: ""
+  extraVolumes: []
+  extraVolumeMounts: []
+  portHTTP: 80
+
+  service:
+    name: tuf-server
+    type: ClusterIP
+    ports:
+      - name: 8080-tcp
+        port: 80
+        protocol: TCP
+        targetPort: 8080
+
+  ingress:
+    enabled: true
+    name: tuf-server
+    className: nginx
+    annotations: {}
+    tls: []
+    hosts:
+      - path: /
+        host: "tuf.localhost.com"
+
+  extraArgs: []
+  containerSecurityContext:
+    enabled: false
+  podSecurityContext:
+    enabled: false
 
 secrets:
   rekor:
@@ -31,21 +76,3 @@ secrets:
     name: ctlog-public-key
     key: public
     path: ctlog-pubkey
-
-ingress:
-  create: true
-  name: tuf-server
-  className: nginx
-  annotations: {}
-  http:
-    hosts:
-    - path: /
-      host: "tuf.localhost"
-
-service:
-  name: tuf-server
-  port: 80
-
-namespace:
-  create: false
-  name: fulcio-system

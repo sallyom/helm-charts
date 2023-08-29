@@ -1,12 +1,16 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: {{ .Values.roleBindingName }}
-{{ include "tuf.namespace" . | indent 2 }}
+  name: {{ tpl (.Values.roleBindingName) $ }}
+{{ tpl (include "common.names.namespace" $) $ | indent 2 }}
+  labels:
+    app.kubernetes.io/component: {{ tpl (include "common.names.name" $) $ }}
+    {{- tpl (include "common.labels.labels" $) $ | nindent 4 }}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
-  name: {{ .Values.roleName }}
+  name: {{ tpl (.Values.roleName) $ }}
 subjects:
   - kind: ServiceAccount
-    name: {{ .Values.serviceAccountName }}
+    name: {{ tpl (include "tuf.serviceAccountName" $) $ }}
+{{ tpl (include "common.names.namespace" $) $ | indent 4 }}
