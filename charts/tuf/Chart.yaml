@@ -13,6 +13,12 @@ maintainers:
 - name: The Sigstore Authors
   url: https://sigstore.dev/
 
+# temporary location
+dependencies:
+  - name: common
+    version: 0.2.0
+    repository: https://repo-securesign-helm-v2.apps.open-svc-sts.k1wl.p1.openshiftapps.com/helm-charts
+
 annotations:
   artifacthub.io/license: Apache-2.0
   artifacthub.io/images: |
