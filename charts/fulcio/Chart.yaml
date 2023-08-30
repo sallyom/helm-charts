@@ -20,7 +20,7 @@ maintainers:
 dependencies:
   - name: ctlog
     version: 0.3.0 # bumped for ctlog-v2
-    repository: https://repo-securesign-helm.apps.open-svc-sts.k1wl.p1.openshiftapps.com/helm-charts
+    repository: https://repo-securesign-helm-v2.apps.open-svc-sts.k1wl.p1.openshiftapps.com/helm-charts
     condition: ctlog.enabled
 
 annotations:
