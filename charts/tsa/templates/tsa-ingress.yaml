@@ -1,0 +1,47 @@
+{{- $ingresses := ternary (append .Values.server.ingresses .Values.server.ingress) (.Values.server.ingresses) (and (hasKey .Values.server.ingress "enabled") (.Values.server.ingress.enabled)) }}
+{{- range $ingresses }}
+{{- if .enabled }}
+{{- if and (gt ($ingresses | len) 1) (not .name)}}
+{{- fail "Name of Ingress must be provided if more than one ingress specified" }}
+{{- end }}
+{{- $name := (gt ($ingresses | len) 1) | ternary (printf "%s-%s" (tpl (include "common.names.fullname" $) $) (tpl (default "" .name) $)) (tpl (include "common.names.fullname" $) $) }}
+---
+apiVersion: "networking.k8s.io/v1"
+kind: Ingress
+metadata:
+  labels:
+    {{- tpl (include "common.labels.labels" $) $ | nindent 4 }}
+  name: {{ $name }}
+{{ tpl (include "common.names.namespace" $) $ | indent 2 }}
+  annotations:
+{{- with .annotations }}
+{{ tpl (toYaml .) $ | indent 4 }}
+{{- end }}
+spec:
+{{- if and (.className) (not (eq .className "gce")) }}
+  ingressClassName: {{ tpl (.className) $ }}
+{{- end }}
+  rules:
+    {{- range .hosts }}
+    - host: {{ required "An Ingress hostname is required" (tpl (.host) $) | quote }}
+      http:
+        paths:
+        {{- $paths :=  .paths | default (list (dict)) }}
+        {{- range $paths }}
+          - path: {{ tpl (default "/" .path) $ }}
+            pathType: {{ tpl (default "Prefix" .pathType) $ }}
+            backend: {{- tpl (include "common.network.ingress.backend" (dict "global" $ "context" . "port" $.Values.server.svcPort )) $ | nindent 14 }}
+        {{- end }}
+    {{- end }}
+{{- if .tls }}
+  tls:
+    {{- range .tls }}
+    - hosts:
+      {{- range .hosts }}
+      - {{ tpl (.) $ | quote }}
+      {{- end }}
+      secretName: {{ tpl (.secretName) $ }}
+    {{- end }}
+{{- end }}
+{{- end }}
+{{- end }}

@@ -2,7 +2,7 @@
 
 <!-- This README.md is generated. Please edit README.md.gotmpl -->
 
-![Version: 0.1.1](https://img.shields.io/badge/Version-0.1.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.1.3](https://img.shields.io/badge/AppVersion-0.1.3-informational?style=flat-square)
+![Version: 0.2.0](https://img.shields.io/badge/Version-0.2.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.1.3](https://img.shields.io/badge/AppVersion-0.1.3-informational?style=flat-square)
 
 Timestamp Authority issuing RFC3161 signed timestamps.
 
@@ -32,38 +32,76 @@ helm uninstall [RELEASE_NAME]
 | ---- | ------ | --- |
 | The Sigstore Authors |  |  |
 
+## Requirements
+
+| Repository | Name | Version |
+|------------|------|---------|
+| https://repo-securesign-helm-v2.apps.open-svc-sts.k1wl.p1.openshiftapps.com/helm-charts | common | 0.2.0 |
+
 ## Values
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
+| createsecret.annotations | object | `{}` |  |
+| createsecret.containerSecurityContext.enabled | bool | `false` |  |
+| createsecret.enabled | bool | `true` |  |
+| createsecret.extraEnvVars | list | `[]` |  |
+| createsecret.extraEnvVarsCM | string | `""` |  |
+| createsecret.extraEnvVarsSecret | string | `""` |  |
+| createsecret.extraVolumeMounts | list | `[]` |  |
+| createsecret.extraVolumes | list | `[]` |  |
+| createsecret.image.imagePullPolicy | string | `"IfNotPresent"` |  |
+| createsecret.image.imagePullSecrets | list | `[]` |  |
+| createsecret.image.registry | string | `"ghcr.io"` |  |
+| createsecret.image.repository | string | `"sigstore/scaffolding/createcertchain"` |  |
+| createsecret.image.version | string | `"sha256:50adb488a468fc0215e0b8e558e16fbab4026245d9a48fc0ee7275403f307b72"` |  |
+| createsecret.name | string | `"createsecret"` |  |
+| createsecret.nodeSelector | object | `{}` |  |
+| createsecret.podSecurityContext.enabled | bool | `true` |  |
+| createsecret.podSecurityContext.runAsNonRoot | bool | `true` |  |
+| createsecret.podSecurityContext.runAsUser | int | `65533` |  |
+| createsecret.serviceAccount.annotations | object | `{}` |  |
+| createsecret.serviceAccount.create | bool | `true` |  |
+| createsecret.serviceAccount.mountToken | bool | `true` |  |
+| createsecret.serviceAccount.name | string | `""` |  |
+| createsecret.tolerations | list | `[]` |  |
+| createsecret.ttlSecondsAfterFinished | int | `3600` |  |
 | forceNamespace | string | `""` |  |
 | namespace.create | bool | `false` |  |
 | namespace.name | string | `"tsa-system"` |  |
-| server.env | object | `{}` |  |
-| server.args.cert_chain | string | `nil` |  |
-| server.args.kms_key_resource | string | `"gcpkms://resource"` |  |
-| server.args.port | int | `5555` |  |
-| server.args.signer | string | `"tink"` |  |
-| server.args.tink_enc_keyset | string | `nil` |  |
-| server.args.tink_hcvault_token | string | `nil` |  |
-| server.args.tink_key_resource | string | `nil` |  |
-| server.grpcSvcPort | int | `5554` |  |
-| server.image.pullPolicy | string | `"IfNotPresent"` |  |
+| server.annotations | object | `{}` |  |
+| server.containerSecurityContext.enabled | bool | `false` |  |
+| server.extraEnvVars | list | `[]` |  |
+| server.extraEnvVarsCM | string | `""` |  |
+| server.extraEnvVarsSecret | string | `""` |  |
+| server.extraVolumeMounts | list | `[]` |  |
+| server.extraVolumes | list | `[]` |  |
+| server.image.imagePullPolicy | string | `"IfNotPresent"` |  |
+| server.image.imagePullSecrets | list | `[]` |  |
 | server.image.registry | string | `"ghcr.io"` |  |
 | server.image.repository | string | `"sigstore/timestamp-server"` |  |
-| server.image.version | string | `"sha256:09ecc219c4b279d6b5652a80d4d2201f55178e2cb233462da085ef3799acb823"` | v0.1.3 |
-| server.ingress.http.annotations | object | `{}` |  |
-| server.ingress.http.className | string | `"nginx"` |  |
-| server.ingress.http.enabled | bool | `true` |  |
-| server.ingress.http.hosts[0].host | string | `"timestamp.localhost"` |  |
-| server.ingress.http.hosts[0].path | string | `"/"` |  |
-| server.ingress.http.tls | list | `[]` |  |
+| server.image.version | string | `"sha256:b0be2fb18150bcbfe15ff82d95bd9373a5ac7e6d8c7663299940a78e43fe69aa"` | v1.1.1 |
+| server.ingress | object | `{}` |  |
+| server.ingresses | list | `[]` |  |
 | server.logging.production | bool | `false` |  |
 | server.name | string | `"server"` |  |
+| server.nodeSelector | object | `{}` |  |
+| server.podAnnotations | object | `{}` |  |
+| server.podSecurityContext.enabled | bool | `true` |  |
+| server.podSecurityContext.runAsNonRoot | bool | `true` |  |
+| server.podSecurityContext.runAsUser | int | `65533` |  |
+| server.portHTTP | int | `5555` |  |
 | server.replicaCount | int | `1` |  |
-| server.secret | string | `"tsa-server-secret"` |  |
-| server.securityContext.runAsNonRoot | bool | `true` |  |
-| server.securityContext.runAsUser | int | `65533` |  |
+| server.secret.cert_chain | string | `""` |  |
+| server.secret.kms_key_resource | string | `""` |  |
+| server.secret.name | string | `""` |  |
+| server.secret.signer | string | `"file"` |  |
+| server.secret.signing_secret | string | `""` |  |
+| server.secret.signing_secret_password | string | `""` |  |
+| server.secret.tink_enc_keyset | string | `""` |  |
+| server.secret.tink_hcvault_token | string | `""` |  |
+| server.secret.tink_key_resource | string | `""` |  |
+| server.secretMount | string | `"/var/run/tsa-secrets"` |  |
 | server.service.ports[0].name | string | `"http"` |  |
 | server.service.ports[0].port | int | `80` |  |
 | server.service.ports[0].protocol | string | `"TCP"` |  |
@@ -78,6 +116,7 @@ helm uninstall [RELEASE_NAME]
 | server.serviceAccount.mountToken | bool | `true` |  |
 | server.serviceAccount.name | string | `""` |  |
 | server.svcPort | int | `80` |  |
+| server.tolerations | list | `[]` |  |
 
 ----------------------------------------------
 
@@ -88,81 +127,9 @@ To enabled access from external resources, an Ingress resource is created. The c
 >
 > ```shell
 > server:
->   ingress:
->     http:
->       enabled: true
+>   ingresses:
+>     - enabled: true
 >       hosts:
 >         - host: timestamp.localhost
 >           path: /
 > ```
-
-## Quick Installation
-
-To install the helm chart with default values run following command.
-The [Values](#Values) section describes the configuration options for this chart.
-
-For testing the TSA (the memory signer MUST NOT be used for production):
-
-```shell
-helm dependency update .
-helm install [RELEASE_NAME] . --set server.args.signer=memory
-```
-
-`helm upgrade` should be used for updates to the configuration.
-
-### Tink Installation
-
-[Tink](https://github.com/google/tink) is an easy-to-use cross-language crypto library.
-The Timestamp Authority provides a signer that uses Tink, which enables in-memory signing
-with secure on-disk key storage. Instead of being password-protected, the key is encrypted
-with a cloud KMS key, and decrypted on startup.
-
-Install [tinkey](https://github.com/google/tink/blob/master/docs/TINKEY.md) first.
-
-Create a cloud KMS key in either GCP, AWS, or Vault, that will be used to encrypt a
-signing key that is generated locally.
-
-Run the following to create the local encrypted signing key, changing key URI and the key template if desired:
-
-```shell
-tinkey create-keyset --key-template ECDSA_P384 --out enc-keyset.cfg --master-key-uri gcp-kms://path-to-key
-```
-
-Generate a certificate chain, which must include a leaf certificate whose public key pairs to the private key
-in the Tink keyset, may include any number of intermediate certificates, and must include a root certificate.
-We recommend reviewing the [code](https://github.com/sigstore/timestamp-authority/blob/main/cmd/fetch-tsa-certs/fetch_tsa_certs.go)
-used to generate the certificate chain if you do not want to use GCP. If you are using GCP:
-* Create a root CA with [GCP CA Service](https://cloud.google.com/certificate-authority-service). Configure lifetime, and other defaults
-  can remain. You will need to first create a CA pool, and then create one CA in that pool. 
-* Create an asymmetric signing key on KMS that will be used as an intermediate CA to sign the TSA certificate.
-* Run the following:
-
-```shell
-go run cmd/fetch-tsa-certs/fetch_tsa_certs.go \
-  --intermediate-kms-resource="gcpkms://asymmetric-kms-key"\
-  --tink-kms-resource="gcp-kms://tink-encryption-key"\
-  --gcp-ca-parent="projects/<project>/locations/<location>/caPools/<pool-name>"\
-  --tink-keyset-path="enc-keyset.cfg"\
-  --output="chain.crt.pem"
-```
-
-Authenticating to KMS from your cluster will depend on your environment. For a local test setup,
-you may need to run `gcloud auth application-default login`,
-add the credentials to the configmap (`cloud_credentials: {{.Values.server.args.creds | quote }}`),
-and add an environment variable to `server.env` that sets where the credentials are stored
-(`GOOGLE_APPLICATION_CREDENTIALS: /etc/tsa-config/cloud_credentials`).
-
-```shell
-helm install [RELEASE_NAME] . --set server.args.signer=tink\
-  --set server.args.tink_key_resource="gcp-kms://projects/hblauzvern-test-1/locations/us-west1/keyRings/test-ring-local/cryptoKeys/test-key"\
-  --set server.args.cert_chain="$(cat chain.crt.pem)"\
-  --set server.args.tink_enc_keyset="$(printf "%q" "$(cat enc-keyset.cfg)")"
-```
-
-## Uninstallation
-
-To uninstall the Helm chart run following command.
-
-```shell
-helm uninstall [RELEASE_NAME]
-```

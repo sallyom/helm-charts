@@ -45,9 +45,8 @@ To enabled access from external resources, an Ingress resource is created. The c
 > 
 > ```shell
 > server:
->   ingress:
->     http:
->       enabled: true
+>   ingresses:
+>     - enabled: true
 >       hosts:
 >         - host: timestamp.localhost
 >           path: /

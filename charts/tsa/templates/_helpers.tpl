@@ -1,84 +1,84 @@
 {{/*
-Expand the name of the chart.
+Create the createsecret name.
 */}}
-{{- define "tsa.name" -}}
-{{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" }}
-{{- end }}
+{{- define "tsa.createsecret.name" -}}
+{{- include "common.names.managedname" (dict "content" $.Values.createsecret "context" $) }}
+{{- end -}}
 
 {{/*
-Create a default fully qualified app name.
+Create a fully qualified createsecret name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
-If release name contains chart name it will be used as a full name.
 */}}
-{{- define "tsa.fullname" -}}
-{{- if .Values.server.fullnameOverride -}}
-{{- .Values.server.fullnameOverride | trunc 63 | trimSuffix "-" -}}
-{{- else -}}
-{{- $name := default .Chart.Name .Values.nameOverride -}}
-{{- if contains $name .Release.Name -}}
-{{- printf "%s-%s" .Release.Name .Values.server.name | trunc 63 | trimSuffix "-" -}}
-{{- else -}}
-{{- printf "%s-%s-%s" .Release.Name $name .Values.server.name | trunc 63 | trimSuffix "-" -}}
-{{- end -}}
-{{- end -}}
-{{- end -}}
-
-{{/*
-Define the raw tsa.namespace template if set with forceNamespace or .Release.Namespace is set
-*/}}
-{{- define "tsa.rawnamespace" -}}
-{{- if .Values.forceNamespace -}}
-{{ print .Values.forceNamespace }}
-{{- else -}}
-{{ print .Release.Namespace }}
-{{- end -}}
-{{- end -}}
-
-{{/*
-Define the tsa.namespace template if set with forceNamespace or .Release.Namespace is set
-*/}}
-{{- define "tsa.namespace" -}}
-{{ printf "namespace: %s" (include "tsa.rawnamespace" .) }}
+{{- define "tsa.createsecret.fullname" -}}
+{{- include "common.names.managedfullname" (dict "content" $.Values.createsecret "context" $) }}
 {{- end -}}
 
 
 {{/*
-Create chart name and version as used by the chart label.
+Create the name of the service account to use for the createsecret component
 */}}
-{{- define "tsa.chart" -}}
-{{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
-{{- end }}
+{{- define "tsa.serviceAccountName.createsecret" -}}
+{{- include "common.names.serviceAccountName" (dict "content" $.Values.createsecret "context" $) }}
+{{- end -}}
 
 {{/*
-Common labels
+Create the cert-chain name
 */}}
-{{- define "tsa.labels" -}}
-helm.sh/chart: {{ include "tsa.chart" . }}
-{{ include "tsa.selectorLabels" . }}
-{{- if .Chart.AppVersion }}
-app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
-{{- end }}
-app.kubernetes.io/managed-by: {{ .Release.Service }}
-{{- end }}
-
-{{/*
-Selector labels
-*/}}
-{{- define "tsa.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "tsa.name" . }}
-app.kubernetes.io/instance: {{ .Release.Name }}
+{{- define "tsa.cert-chain.name" -}}
+{{ include "common.names.fullnameSuffix" (dict "suffix" "cert-chain" "context" $) }}
 {{- end }}
 
 {{/*
 Create the name of the service account to use
 */}}
 {{- define "tsa.serviceAccountName" -}}
-{{- if .Values.server.serviceAccount.create }}
-{{- default (include "tsa.fullname" .) .Values.server.serviceAccount.name }}
+{{- include "common.names.serviceAccountName" (dict "content" $.Values.server "context" $) }}
+{{- end }}
+
+{{/*
+Create the tsa secret name
+*/}}
+{{- define "tsa.secret.name" -}}
+{{ tpl (.Values.secret | default (include "tsa.cert-chain.name" .)) $ }}
+{{- end }}
+
+{{/*
+Server Arguments
+*/}}
+{{- define "tsa.server.args" -}}
+- "serve"
+- "--host=0.0.0.0"
+- "--port={{ .Values.server.portHTTP }}"
+- "--timestamp-signer={{ .Values.server.secret.signer }}"
+{{- if eq .Values.server.secret.signer "tink" }}
+- "--tink-key-resource={{ required "Tink key for signing timestamp responses is required" .Values.server.secret.tink_key_resource }}"
+- "--tink-keyset-path={{ .Values.server.secretMount }}/tink.keyset.enc"
+- "--certificate-chain-path={{ .Values.server.secretMount }}/cert-chain"
+- "--tink-hcvault-token={{ required "Tink authentication token for Hashicorp Vault API is required" .Values.server.secret.tink_hcvault_token }}"
+{{- end }}
+{{- if eq .Values.server.secret.signer "kms" }}
+- "--kms-key-resource={{ required "KMS key for signing timestamp responses is required" .Values.server.secret.kms_key_resource }}"
+- "--certificate-chain-path={{ .Values.server.secretMount }}/cert-chain"
+{{- end }}
+{{- if eq .Values.server.secret.signer "file" }}
+- "--file-signer-key-path={{ .Values.server.secretMount }}/signing-secret"
+- "--file-signer-passwd=$(SIGNING_SECRET_PASSWORD)"
+- "--certificate-chain-path={{ .Values.server.secretMount }}/cert-chain"
+{{- end }}
+{{- if .Values.server.logging.production }}
+- "--log-type=prod"
+{{- end -}}
+{{- if .Values.server.extraArgs -}}
+{{- range $key, $value := .Values.server.extraArgs }}
+{{- if $value }}
+- {{ printf "%v=%v" $key $value | quote }}
 {{- else }}
-{{- default "default" .Values.server.serviceAccount.name }}
+- {{ printf $key | quote }}
 {{- end }}
 {{- end }}
+{{- end -}}
+{{- end -}}
+
 
 {{/*
 Create the image path for the passed in image field

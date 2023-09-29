@@ -5,11 +5,35 @@
     "default": {},
     "title": "Root Schema",
     "required": [
+        "global",
         "namespace",
         "server",
+        "createsecret",
         "forceNamespace"
     ],
     "properties": {
+        "global": {
+            "type": "object",
+            "default": {},
+            "title": "The global Schema",
+            "required": [
+                "imagePullSecrets"
+            ],
+            "properties": {
+                "imagePullSecrets": {
+                    "type": "array",
+                    "default": [],
+                    "title": "The imagePullSecrets Schema",
+                    "items": {},
+                    "examples": [
+                        []
+                    ]
+                }
+            },
+            "examples": [{
+                "imagePullSecrets": []
+            }]
+        },
         "namespace": {
             "type": "object",
             "default": {},
@@ -49,16 +73,26 @@
                 "replicaCount",
                 "name",
                 "svcPort",
-                "grpcSvcPort",
-                "secret",
+                "portHTTP",
+                "secretMount",
+                "podAnnotations",
                 "logging",
-                "env",
                 "image",
-                "args",
+                "secret",
                 "serviceAccount",
+                "containerSecurityContext",
+                "podSecurityContext",
+                "annotations",
+                "nodeSelector",
+                "tolerations",
+                "extraEnvVars",
+                "extraEnvVarsCM",
+                "extraEnvVarsSecret",
+                "extraVolumes",
+                "extraVolumeMounts",
                 "service",
                 "ingress",
-                "securityContext"
+                "ingresses"
             ],
             "properties": {
                 "replicaCount": {
@@ -85,21 +119,29 @@
                         80
                     ]
                 },
-                "grpcSvcPort": {
+                "portHTTP": {
                     "type": "integer",
                     "default": 0,
-                    "title": "The grpcSvcPort Schema",
+                    "title": "The portHTTP Schema",
                     "examples": [
-                        5554
+                        5555
                     ]
                 },
-                "secret": {
+                "secretMount": {
                     "type": "string",
                     "default": "",
-                    "title": "The secret Schema",
+                    "title": "The secretMount Schema",
                     "examples": [
-                        "tsa-server-secret"
+                        "/var/run/tsa-secrets"
                     ]
+                },
+                "podAnnotations": {
+                    "type": "object",
+                    "default": {},
+                    "title": "The podAnnotations Schema",
+                    "required": [],
+                    "properties": {},
+                    "examples": [{}]
                 },
                 "logging": {
                     "type": "object",
@@ -122,14 +164,6 @@
                         "production": false
                     }]
                 },
-                "env": {
-                    "type": "object",
-                    "default": {},
-                    "title": "The env Schema",
-                    "required": [],
-                    "properties": {},
-                    "examples": [{}]
-                },
                 "image": {
                     "type": "object",
                     "default": {},
@@ -137,7 +171,8 @@
                     "required": [
                         "registry",
                         "repository",
-                        "pullPolicy",
+                        "imagePullPolicy",
+                        "imagePullSecrets",
                         "version"
                     ],
                     "properties": {
@@ -157,12 +192,21 @@
                                 "sigstore/timestamp-server"
                             ]
                         },
-                        "pullPolicy": {
+                        "imagePullPolicy": {
                             "type": "string",
                             "default": "",
-                            "title": "The pullPolicy Schema",
+                            "title": "The imagePullPolicy Schema",
                             "examples": [
                                 "IfNotPresent"
+                            ]
+                        },
+                        "imagePullSecrets": {
+                            "type": "array",
+                            "default": [],
+                            "title": "The imagePullSecrets Schema",
+                            "items": {},
+                            "examples": [
+                                []
                             ]
                         },
                         "version": {
@@ -170,37 +214,40 @@
                             "default": "",
                             "title": "The version Schema",
                             "examples": [
-                                "sha256:6d923276ff81b814c99d8c901184ebb8b9a0411eacf61d9fe0b26fce68e5a5ee"
+                                "sha256:b0be2fb18150bcbfe15ff82d95bd9373a5ac7e6d8c7663299940a78e43fe69aa"
                             ]
                         }
                     },
                     "examples": [{
                         "registry": "ghcr.io",
                         "repository": "sigstore/timestamp-server",
-                        "pullPolicy": "IfNotPresent",
-                        "version": "sha256:6d923276ff81b814c99d8c901184ebb8b9a0411eacf61d9fe0b26fce68e5a5ee"
+                        "imagePullPolicy": "IfNotPresent",
+                        "imagePullSecrets": [],
+                        "version": "sha256:b0be2fb18150bcbfe15ff82d95bd9373a5ac7e6d8c7663299940a78e43fe69aa"
                     }]
                 },
-                "args": {
+                "secret": {
                     "type": "object",
                     "default": {},
-                    "title": "The args Schema",
+                    "title": "The secret Schema",
                     "required": [
-                        "port",
+                        "name",
                         "signer",
                         "cert_chain",
+                        "signing_secret",
+                        "signing_secret_password",
                         "tink_enc_keyset",
                         "tink_key_resource",
                         "tink_hcvault_token",
                         "kms_key_resource"
                     ],
                     "properties": {
-                        "port": {
-                            "type": "integer",
-                            "default": 0,
-                            "title": "The port Schema",
+                        "name": {
+                            "type": "string",
+                            "default": "",
+                            "title": "The name Schema",
                             "examples": [
-                                5555
+                                ""
                             ]
                         },
                         "signer": {
@@ -208,7 +255,7 @@
                             "default": "",
                             "title": "The signer Schema",
                             "examples": [
-                                "tink"
+                                "file"
                             ]
                         },
                         "cert_chain": {
@@ -216,7 +263,23 @@
                             "default": "",
                             "title": "The cert_chain Schema",
                             "examples": [
-                                "chain"
+                                ""
+                            ]
+                        },
+                        "signing_secret": {
+                            "type": "string",
+                            "default": "",
+                            "title": "The signing_secret Schema",
+                            "examples": [
+                                ""
+                            ]
+                        },
+                        "signing_secret_password": {
+                            "type": "string",
+                            "default": "",
+                            "title": "The signing_secret_password Schema",
+                            "examples": [
+                                ""
                             ]
                         },
                         "tink_enc_keyset": {
@@ -224,7 +287,7 @@
                             "default": "",
                             "title": "The tink_enc_keyset Schema",
                             "examples": [
-                                "keyset"
+                                ""
                             ]
                         },
                         "tink_key_resource": {
@@ -232,7 +295,7 @@
                             "default": "",
                             "title": "The tink_key_resource Schema",
                             "examples": [
-                                "resource"
+                                ""
                             ]
                         },
                         "tink_hcvault_token": {
@@ -240,7 +303,7 @@
                             "default": "",
                             "title": "The tink_hcvault_token Schema",
                             "examples": [
-                                "token"
+                                ""
                             ]
                         },
                         "kms_key_resource": {
@@ -248,18 +311,20 @@
                             "default": "",
                             "title": "The kms_key_resource Schema",
                             "examples": [
-                                "resource"
+                                ""
                             ]
                         }
                     },
                     "examples": [{
-                        "port": 5555,
-                        "signer": "tink",
-                        "cert_chain": "chain",
-                        "tink_enc_keyset": "keyset",
-                        "tink_key_resource": "resource",
-                        "tink_hcvault_token": "token",
-                        "kms_key_resource": "resource"
+                        "name": "",
+                        "signer": "file",
+                        "cert_chain": "",
+                        "signing_secret": "",
+                        "signing_secret_password": "",
+                        "tink_enc_keyset": "",
+                        "tink_key_resource": "",
+                        "tink_hcvault_token": "",
+                        "kms_key_resource": ""
                     }]
                 },
                 "serviceAccount": {
@@ -312,6 +377,136 @@
                         "annotations": {},
                         "mountToken": true
                     }]
+                },
+                "containerSecurityContext": {
+                    "type": "object",
+                    "default": {},
+                    "title": "The containerSecurityContext Schema",
+                    "required": [
+                        "enabled"
+                    ],
+                    "properties": {
+                        "enabled": {
+                            "type": "boolean",
+                            "default": false,
+                            "title": "The enabled Schema",
+                            "examples": [
+                                false
+                            ]
+                        }
+                    },
+                    "examples": [{
+                        "enabled": false
+                    }]
+                },
+                "podSecurityContext": {
+                    "type": "object",
+                    "default": {},
+                    "title": "The podSecurityContext Schema",
+                    "required": [
+                        "enabled",
+                        "runAsNonRoot",
+                        "runAsUser"
+                    ],
+                    "properties": {
+                        "enabled": {
+                            "type": "boolean",
+                            "default": false,
+                            "title": "The enabled Schema",
+                            "examples": [
+                                true
+                            ]
+                        },
+                        "runAsNonRoot": {
+                            "type": "boolean",
+                            "default": false,
+                            "title": "The runAsNonRoot Schema",
+                            "examples": [
+                                true
+                            ]
+                        },
+                        "runAsUser": {
+                            "type": "integer",
+                            "default": 0,
+                            "title": "The runAsUser Schema",
+                            "examples": [
+                                65533
+                            ]
+                        }
+                    },
+                    "examples": [{
+                        "enabled": true,
+                        "runAsNonRoot": true,
+                        "runAsUser": 65533
+                    }]
+                },
+                "annotations": {
+                    "type": "object",
+                    "default": {},
+                    "title": "The annotations Schema",
+                    "required": [],
+                    "properties": {},
+                    "examples": [{}]
+                },
+                "nodeSelector": {
+                    "type": "object",
+                    "default": {},
+                    "title": "The nodeSelector Schema",
+                    "required": [],
+                    "properties": {},
+                    "examples": [{}]
+                },
+                "tolerations": {
+                    "type": "array",
+                    "default": [],
+                    "title": "The tolerations Schema",
+                    "items": {},
+                    "examples": [
+                        []
+                    ]
+                },
+                "extraEnvVars": {
+                    "type": "array",
+                    "default": [],
+                    "title": "The extraEnvVars Schema",
+                    "items": {},
+                    "examples": [
+                        []
+                    ]
+                },
+                "extraEnvVarsCM": {
+                    "type": "string",
+                    "default": "",
+                    "title": "The extraEnvVarsCM Schema",
+                    "examples": [
+                        ""
+                    ]
+                },
+                "extraEnvVarsSecret": {
+                    "type": "string",
+                    "default": "",
+                    "title": "The extraEnvVarsSecret Schema",
+                    "examples": [
+                        ""
+                    ]
+                },
+                "extraVolumes": {
+                    "type": "array",
+                    "default": [],
+                    "title": "The extraVolumes Schema",
+                    "items": {},
+                    "examples": [
+                        []
+                    ]
+                },
+                "extraVolumeMounts": {
+                    "type": "array",
+                    "default": [],
+                    "title": "The extraVolumeMounts Schema",
+                    "items": {},
+                    "examples": [
+                        []
+                    ]
                 },
                 "service": {
                     "type": "object",
@@ -425,132 +620,287 @@
                     "type": "object",
                     "default": {},
                     "title": "The ingress Schema",
+                    "required": [],
+                    "properties": {},
+                    "examples": [{}]
+                },
+                "ingresses": {
+                    "type": "array",
+                    "default": [],
+                    "title": "The ingresses Schema",
+                    "items": {},
+                    "examples": [
+                        []
+                    ]
+                }
+            },
+            "examples": [{
+                "replicaCount": 1,
+                "name": "server",
+                "svcPort": 80,
+                "portHTTP": 5555,
+                "secretMount": "/var/run/tsa-secrets",
+                "podAnnotations": {},
+                "logging": {
+                    "production": false
+                },
+                "image": {
+                    "registry": "ghcr.io",
+                    "repository": "sigstore/timestamp-server",
+                    "imagePullPolicy": "IfNotPresent",
+                    "imagePullSecrets": [],
+                    "version": "sha256:b0be2fb18150bcbfe15ff82d95bd9373a5ac7e6d8c7663299940a78e43fe69aa"
+                },
+                "secret": {
+                    "name": "",
+                    "signer": "file",
+                    "cert_chain": "",
+                    "signing_secret": "",
+                    "signing_secret_password": "",
+                    "tink_enc_keyset": "",
+                    "tink_key_resource": "",
+                    "tink_hcvault_token": "",
+                    "kms_key_resource": ""
+                },
+                "serviceAccount": {
+                    "create": true,
+                    "name": "",
+                    "annotations": {},
+                    "mountToken": true
+                },
+                "containerSecurityContext": {
+                    "enabled": false
+                },
+                "podSecurityContext": {
+                    "enabled": true,
+                    "runAsNonRoot": true,
+                    "runAsUser": 65533
+                },
+                "annotations": {},
+                "nodeSelector": {},
+                "tolerations": [],
+                "extraEnvVars": [],
+                "extraEnvVarsCM": "",
+                "extraEnvVarsSecret": "",
+                "extraVolumes": [],
+                "extraVolumeMounts": [],
+                "service": {
+                    "type": "ClusterIP",
+                    "ports": [{
+                        "name": "http",
+                        "port": 80,
+                        "protocol": "TCP",
+                        "targetPort": 5555
+                    },
+                    {
+                        "name": "metrics",
+                        "port": 2112,
+                        "protocol": "TCP",
+                        "targetPort": 2112
+                    }]
+                },
+                "ingress": {},
+                "ingresses": []
+            }]
+        },
+        "createsecret": {
+            "type": "object",
+            "default": {},
+            "title": "The createsecret Schema",
+            "required": [
+                "enabled",
+                "name",
+                "image",
+                "ttlSecondsAfterFinished",
+                "serviceAccount",
+                "containerSecurityContext",
+                "podSecurityContext",
+                "annotations",
+                "nodeSelector",
+                "tolerations",
+                "extraEnvVars",
+                "extraEnvVarsCM",
+                "extraEnvVarsSecret",
+                "extraVolumes",
+                "extraVolumeMounts"
+            ],
+            "properties": {
+                "enabled": {
+                    "type": "boolean",
+                    "default": false,
+                    "title": "The enabled Schema",
+                    "examples": [
+                        true
+                    ]
+                },
+                "name": {
+                    "type": "string",
+                    "default": "",
+                    "title": "The name Schema",
+                    "examples": [
+                        "createsecret"
+                    ]
+                },
+                "image": {
+                    "type": "object",
+                    "default": {},
+                    "title": "The image Schema",
                     "required": [
-                        "http"
+                        "registry",
+                        "repository",
+                        "imagePullPolicy",
+                        "imagePullSecrets",
+                        "version"
                     ],
                     "properties": {
-                        "http": {
-                            "type": "object",
-                            "default": {},
-                            "title": "The http Schema",
-                            "required": [
-                                "enabled",
-                                "className",
-                                "annotations",
-                                "hosts",
-                                "tls"
-                            ],
-                            "properties": {
-                                "enabled": {
-                                    "type": "boolean",
-                                    "default": false,
-                                    "title": "The enabled Schema",
-                                    "examples": [
-                                        true
-                                    ]
-                                },
-                                "className": {
-                                    "type": "string",
-                                    "default": "",
-                                    "title": "The className Schema",
-                                    "examples": [
-                                        "nginx"
-                                    ]
-                                },
-                                "annotations": {
-                                    "type": "object",
-                                    "default": {},
-                                    "title": "The annotations Schema",
-                                    "required": [],
-                                    "properties": {},
-                                    "examples": [{}]
-                                },
-                                "hosts": {
-                                    "type": "array",
-                                    "default": [],
-                                    "title": "The hosts Schema",
-                                    "items": {
-                                        "type": "object",
-                                        "default": {},
-                                        "title": "A Schema",
-                                        "required": [
-                                            "path",
-                                            "host"
-                                        ],
-                                        "properties": {
-                                            "path": {
-                                                "type": "string",
-                                                "default": "",
-                                                "title": "The path Schema",
-                                                "examples": [
-                                                    "/"
-                                                ]
-                                            },
-                                            "host": {
-                                                "type": "string",
-                                                "default": "",
-                                                "title": "The host Schema",
-                                                "examples": [
-                                                    "timestamp.localhost"
-                                                ]
-                                            }
-                                        },
-                                        "examples": [{
-                                            "path": "/",
-                                            "host": "timestamp.localhost"
-                                        }]
-                                    },
-                                    "examples": [
-                                        [{
-                                            "path": "/",
-                                            "host": "timestamp.localhost"
-                                        }]
-                                    ]
-                                },
-                                "tls": {
-                                    "type": "array",
-                                    "default": [],
-                                    "title": "The tls Schema",
-                                    "items": {},
-                                    "examples": [
-                                        []
-                                    ]
-                                }
-                            },
-                            "examples": [{
-                                "enabled": true,
-                                "className": "nginx",
-                                "annotations": {},
-                                "hosts": [{
-                                    "path": "/",
-                                    "host": "timestamp.localhost"
-                                }],
-                                "tls": []
-                            }]
+                        "registry": {
+                            "type": "string",
+                            "default": "",
+                            "title": "The registry Schema",
+                            "examples": [
+                                "ghcr.io"
+                            ]
+                        },
+                        "repository": {
+                            "type": "string",
+                            "default": "",
+                            "title": "The repository Schema",
+                            "examples": [
+                                "sigstore/scaffolding/createcertchain"
+                            ]
+                        },
+                        "imagePullPolicy": {
+                            "type": "string",
+                            "default": "",
+                            "title": "The imagePullPolicy Schema",
+                            "examples": [
+                                "IfNotPresent"
+                            ]
+                        },
+                        "imagePullSecrets": {
+                            "type": "array",
+                            "default": [],
+                            "title": "The imagePullSecrets Schema",
+                            "items": {},
+                            "examples": [
+                                []
+                            ]
+                        },
+                        "version": {
+                            "type": "string",
+                            "default": "",
+                            "title": "The version Schema",
+                            "examples": [
+                                "sha256:50adb488a468fc0215e0b8e558e16fbab4026245d9a48fc0ee7275403f307b72"
+                            ]
                         }
                     },
                     "examples": [{
-                        "http": {
-                            "enabled": true,
-                            "className": "nginx",
-                            "annotations": {},
-                            "hosts": [{
-                                "path": "/",
-                                "host": "timestamp.localhost"
-                            }],
-                            "tls": []
-                        }
+                        "registry": "ghcr.io",
+                        "repository": "sigstore/scaffolding/createcertchain",
+                        "imagePullPolicy": "IfNotPresent",
+                        "imagePullSecrets": [],
+                        "version": "sha256:50adb488a468fc0215e0b8e558e16fbab4026245d9a48fc0ee7275403f307b72"
                     }]
                 },
-                "securityContext": {
+                "ttlSecondsAfterFinished": {
+                    "type": "integer",
+                    "default": 0,
+                    "title": "The ttlSecondsAfterFinished Schema",
+                    "examples": [
+                        3600
+                    ]
+                },
+                "serviceAccount": {
                     "type": "object",
                     "default": {},
-                    "title": "The securityContext Schema",
+                    "title": "The serviceAccount Schema",
                     "required": [
+                        "create",
+                        "name",
+                        "annotations",
+                        "mountToken"
+                    ],
+                    "properties": {
+                        "create": {
+                            "type": "boolean",
+                            "default": false,
+                            "title": "The create Schema",
+                            "examples": [
+                                true
+                            ]
+                        },
+                        "name": {
+                            "type": "string",
+                            "default": "",
+                            "title": "The name Schema",
+                            "examples": [
+                                ""
+                            ]
+                        },
+                        "annotations": {
+                            "type": "object",
+                            "default": {},
+                            "title": "The annotations Schema",
+                            "required": [],
+                            "properties": {},
+                            "examples": [{}]
+                        },
+                        "mountToken": {
+                            "type": "boolean",
+                            "default": false,
+                            "title": "The mountToken Schema",
+                            "examples": [
+                                true
+                            ]
+                        }
+                    },
+                    "examples": [{
+                        "create": true,
+                        "name": "",
+                        "annotations": {},
+                        "mountToken": true
+                    }]
+                },
+                "containerSecurityContext": {
+                    "type": "object",
+                    "default": {},
+                    "title": "The containerSecurityContext Schema",
+                    "required": [
+                        "enabled"
+                    ],
+                    "properties": {
+                        "enabled": {
+                            "type": "boolean",
+                            "default": false,
+                            "title": "The enabled Schema",
+                            "examples": [
+                                false
+                            ]
+                        }
+                    },
+                    "examples": [{
+                        "enabled": false
+                    }]
+                },
+                "podSecurityContext": {
+                    "type": "object",
+                    "default": {},
+                    "title": "The podSecurityContext Schema",
+                    "required": [
+                        "enabled",
                         "runAsNonRoot",
                         "runAsUser"
                     ],
                     "properties": {
+                        "enabled": {
+                            "type": "boolean",
+                            "default": false,
+                            "title": "The enabled Schema",
+                            "examples": [
+                                true
+                            ]
+                        },
                         "runAsNonRoot": {
                             "type": "boolean",
                             "default": false,
@@ -569,73 +919,113 @@
                         }
                     },
                     "examples": [{
+                        "enabled": true,
                         "runAsNonRoot": true,
                         "runAsUser": 65533
                     }]
+                },
+                "annotations": {
+                    "type": "object",
+                    "default": {},
+                    "title": "The annotations Schema",
+                    "required": [],
+                    "properties": {},
+                    "examples": [{}]
+                },
+                "nodeSelector": {
+                    "type": "object",
+                    "default": {},
+                    "title": "The nodeSelector Schema",
+                    "required": [],
+                    "properties": {},
+                    "examples": [{}]
+                },
+                "tolerations": {
+                    "type": "array",
+                    "default": [],
+                    "title": "The tolerations Schema",
+                    "items": {},
+                    "examples": [
+                        []
+                    ]
+                },
+                "extraEnvVars": {
+                    "type": "array",
+                    "default": [],
+                    "title": "The extraEnvVars Schema",
+                    "items": {},
+                    "examples": [
+                        []
+                    ]
+                },
+                "extraEnvVarsCM": {
+                    "type": "string",
+                    "default": "",
+                    "title": "The extraEnvVarsCM Schema",
+                    "examples": [
+                        ""
+                    ]
+                },
+                "extraEnvVarsSecret": {
+                    "type": "string",
+                    "default": "",
+                    "title": "The extraEnvVarsSecret Schema",
+                    "examples": [
+                        ""
+                    ]
+                },
+                "extraVolumes": {
+                    "type": "array",
+                    "default": [],
+                    "title": "The extraVolumes Schema",
+                    "items": {},
+                    "examples": [
+                        []
+                    ]
+                },
+                "extraVolumeMounts": {
+                    "type": "array",
+                    "default": [],
+                    "title": "The extraVolumeMounts Schema",
+                    "items": {},
+                    "examples": [
+                        []
+                    ]
                 }
             },
             "examples": [{
-                "replicaCount": 1,
-                "name": "server",
-                "svcPort": 80,
-                "grpcSvcPort": 5554,
-                "secret": "tsa-server-secret",
-                "logging": {
-                    "production": false
-                },
-                "env": {},
+                "enabled": true,
+                "name": "createsecret",
                 "image": {
                     "registry": "ghcr.io",
-                    "repository": "sigstore/timestamp-server",
-                    "pullPolicy": "IfNotPresent",
-                    "version": "sha256:6d923276ff81b814c99d8c901184ebb8b9a0411eacf61d9fe0b26fce68e5a5ee"
+                    "repository": "sigstore/scaffolding/createcertchain",
+                    "imagePullPolicy": "IfNotPresent",
+                    "imagePullSecrets": [],
+                    "version": "sha256:50adb488a468fc0215e0b8e558e16fbab4026245d9a48fc0ee7275403f307b72"
                 },
-                "args": {
-                    "port": 5555,
-                    "signer": "tink",
-                    "cert_chain": "chain",
-                    "tink_enc_keyset": "keyset",
-                    "tink_key_resource": "resource",
-                    "tink_hcvault_token": "token",
-                    "kms_key_resource": "resource"
-                },
+                "ttlSecondsAfterFinished": 3600,
                 "serviceAccount": {
                     "create": true,
                     "name": "",
                     "annotations": {},
                     "mountToken": true
                 },
-                "service": {
-                    "type": "ClusterIP",
-                    "ports": [{
-                        "name": "http",
-                        "port": 80,
-                        "protocol": "TCP",
-                        "targetPort": 5555
-                    },
-                    {
-                        "name": "metrics",
-                        "port": 2112,
-                        "protocol": "TCP",
-                        "targetPort": 2112
-                    }]
+                "containerSecurityContext": {
+                    "enabled": false
                 },
-                "ingress": {
-                    "http": {
-                        "enabled": true,
-                        "className": "nginx",
-                        "annotations": {},
-                        "hosts": [{
-                            "path": "/",
-                            "host": "timestamp.localhost"
-                        }],
-                        "tls": []
-                    }
-                },
-                "securityContext": {
+                "podSecurityContext": {
+                    "enabled": true,
                     "runAsNonRoot": true,
                     "runAsUser": 65533
-                }
+                },
+                "annotations": {},
+                "nodeSelector": {},
+                "tolerations": [],
+                "extraEnvVars": [],
+                "extraEnvVarsCM": "",
+                "extraEnvVarsSecret": "",
+                "extraVolumes": [],
+                "extraVolumeMounts": []
             }]
         },
         "forceNamespace": {
@@ -648,6 +1038,9 @@
         }
     },
     "examples": [{
+        "global": {
+            "imagePullSecrets": []
+        },
         "namespace": {
             "create": false,
             "name": "tsa-system"
@@ -656,26 +1049,29 @@
             "replicaCount": 1,
             "name": "server",
             "svcPort": 80,
-            "grpcSvcPort": 5554,
-            "secret": "tsa-server-secret",
+            "portHTTP": 5555,
+            "secretMount": "/var/run/tsa-secrets",
+            "podAnnotations": {},
             "logging": {
                 "production": false
             },
-            "env": {},
             "image": {
                 "registry": "ghcr.io",
                 "repository": "sigstore/timestamp-server",
-                "pullPolicy": "IfNotPresent",
-                "version": "sha256:6d923276ff81b814c99d8c901184ebb8b9a0411eacf61d9fe0b26fce68e5a5ee"
+                "imagePullPolicy": "IfNotPresent",
+                "imagePullSecrets": [],
+                "version": "sha256:b0be2fb18150bcbfe15ff82d95bd9373a5ac7e6d8c7663299940a78e43fe69aa"
             },
-            "args": {
-                "port": 5555,
-                "signer": "tink",
-                "cert_chain": "chain",
-                "tink_enc_keyset": "keyset",
-                "tink_key_resource": "resource",
-                "tink_hcvault_token": "token",
-                "kms_key_resource": "resource"
+            "secret": {
+                "name": "",
+                "signer": "file",
+                "cert_chain": "",
+                "signing_secret": "",
+                "signing_secret_password": "",
+                "tink_enc_keyset": "",
+                "tink_key_resource": "",
+                "tink_hcvault_token": "",
+                "kms_key_resource": ""
             },
             "serviceAccount": {
                 "create": true,
@@ -683,6 +1079,22 @@
                 "annotations": {},
                 "mountToken": true
             },
+            "containerSecurityContext": {
+                "enabled": false
+            },
+            "podSecurityContext": {
+                "enabled": true,
+                "runAsNonRoot": true,
+                "runAsUser": 65533
+            },
+            "annotations": {},
+            "nodeSelector": {},
+            "tolerations": [],
+            "extraEnvVars": [],
+            "extraEnvVarsCM": "",
+            "extraEnvVarsSecret": "",
+            "extraVolumes": [],
+            "extraVolumeMounts": [],
             "service": {
                 "type": "ClusterIP",
                 "ports": [{
@@ -698,22 +1110,42 @@
                     "targetPort": 2112
                 }]
             },
-            "ingress": {
-                "http": {
-                    "enabled": true,
-                    "className": "nginx",
-                    "annotations": {},
-                    "hosts": [{
-                        "path": "/",
-                        "host": "timestamp.localhost"
-                    }],
-                    "tls": []
-                }
+            "ingress": {},
+            "ingresses": []
+        },
+        "createsecret": {
+            "enabled": true,
+            "name": "createsecret",
+            "image": {
+                "registry": "ghcr.io",
+                "repository": "sigstore/scaffolding/createcertchain",
+                "imagePullPolicy": "IfNotPresent",
+                "imagePullSecrets": [],
+                "version": "sha256:50adb488a468fc0215e0b8e558e16fbab4026245d9a48fc0ee7275403f307b72"
             },
-            "securityContext": {
+            "ttlSecondsAfterFinished": 3600,
+            "serviceAccount": {
+                "create": true,
+                "name": "",
+                "annotations": {},
+                "mountToken": true
+            },
+            "containerSecurityContext": {
+                "enabled": false
+            },
+            "podSecurityContext": {
+                "enabled": true,
                 "runAsNonRoot": true,
                 "runAsUser": 65533
-            }
+            },
+            "annotations": {},
+            "nodeSelector": {},
+            "tolerations": [],
+            "extraEnvVars": [],
+            "extraEnvVarsCM": "",
+            "extraEnvVarsSecret": "",
+            "extraVolumes": [],
+            "extraVolumeMounts": []
         },
         "forceNamespace": ""
     }]
