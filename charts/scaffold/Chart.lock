@@ -15,7 +15,7 @@ dependencies:
   repository: https://repo-securesign-helm-v2.apps.open-svc-sts.k1wl.p1.openshiftapps.com/helm-charts
   version: 0.2.0
 - name: tsa
-  repository: https://sigstore.github.io/helm-charts
-  version: 0.1.0
-digest: sha256:f2ae2aa828099ab6968109b1d97020beefdf8fe4f429db0f686902e9c00313ca
-generated: "2023-08-28T23:27:38.755221564-04:00"
+  repository: https://repo-securesign-helm-v2.apps.open-svc-sts.k1wl.p1.openshiftapps.com/helm-charts
+  version: 0.2.0
+digest: sha256:ece86476a5624656d94ec327652fa5eb3ea20b6d0f48c16ed8db0e6489114938
+generated: "2023-10-05T14:10:43.329348363-04:00"
