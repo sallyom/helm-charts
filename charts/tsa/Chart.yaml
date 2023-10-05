@@ -19,7 +19,7 @@ maintainers:
 
 dependencies:
   - name: common
-    version: 0.2.0
+    version: 0.1.2
     repository: https://repo-securesign-helm-v2.apps.open-svc-sts.k1wl.p1.openshiftapps.com/helm-charts
 
 annotations:
